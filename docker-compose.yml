@@ -1,0 +1,80 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mysqladmin
+      MYSQL_ROOT_PASSWORD: mysqladmin
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqldb_data:/var/lib/mysql
+  postgres:
+    image: postgres:11
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+    ports:
+      - 5432:5432
+    # env_file:
+    #   - ./postgres/postgres.env
+    volumes:
+      - pgdb_data:/var/lib/postgresql/data
+      # - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      # - ./postgres/conf.d:/etc/postgresql/conf.d
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass redisadmin
+    ports:
+      - '6379:6379'
+    environment:
+     - REDIS_REPLICATION_MODE=master
+    volumes: 
+      - redisdb_data:/data
+      # - $PWD/redis-data:/var/lib/redis
+      # - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+  elasticsearch:
+    image: elasticsearch:7.9.2
+    ports:
+      - 9200:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # env_file:
+    #   - ./elastic/elastic.env
+    volumes:
+      - esdb_data:/usr/share/elasticsearch/data
+  kibana:
+    image: kibana:7.9.2
+    ports:
+      - 5601:5601
+  logstash:
+    image: logstash:7.9.2
+    volumes:
+      - logstashdb_data:/usr/share/logstash/data/
+      # - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      # - ./logstash/config/log4j2.properties:/usr/share/logstash/config/log4j2.properties
+      # - ./logstash/pipeline:/usr/share/logstash/pipeline/
+volumes:
+  mongodb_data:
+  mysqldb_data:
+  pgdb_data:
+  redisdb_data:
+  esdb_data:
+  logstashdb_data:
