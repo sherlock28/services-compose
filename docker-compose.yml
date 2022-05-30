@@ -27,9 +27,8 @@ services:
   postgres:
     image: postgres:11.16-alpine
     container_name: postgres
-    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     ports:
-      - 5432:5432
+      - "5432:5432"
     # env_file:
     #   - ./postgres/postgres.env
     volumes:
@@ -37,13 +36,13 @@ services:
       - ./postgresql/database/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       # - ./postgres/conf.d:/etc/postgresql/conf.d
       - pgdb_data:/var/lib/postgresql/data
+    # entrypoint: tail -f /dev/null
     restart: always
     environment:
+      - POSTGRES_DB=mydb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - PGDATA=/data/postgres
-    networks:
-      - postgres
   redis:
     image: redis:6.2-alpine
     container_name: redis
@@ -89,11 +88,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - 5050:80
+      - 8080:80
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - postgres
+    depends_on:
+      - postgres    
 
 networks:
   postgres:
