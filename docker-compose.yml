@@ -25,16 +25,25 @@ services:
     volumes:
       - mysqldb_data:/var/lib/mysql
   postgres:
-    image: postgres:11
+    image: postgres:11.16-alpine
+    container_name: postgres
     command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     ports:
       - 5432:5432
     # env_file:
     #   - ./postgres/postgres.env
     volumes:
-      - pgdb_data:/var/lib/postgresql/data
-      # - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgresql/database/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       # - ./postgres/conf.d:/etc/postgresql/conf.d
+      - pgdb_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/data/postgres
+    networks:
+      - postgres
   redis:
     image: redis:6.2-alpine
     container_name: redis
@@ -71,6 +80,25 @@ services:
       # - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
       # - ./logstash/config/log4j2.properties:/usr/share/logstash/config/log4j2.properties
       # - ./logstash/pipeline:/usr/share/logstash/pipeline/
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - 5050:80
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
 volumes:
   mongodb_data:
   mysqldb_data:
@@ -78,3 +106,4 @@ volumes:
   redisdb_data:
   esdb_data:
   logstashdb_data:
+  pgadmin_data:
