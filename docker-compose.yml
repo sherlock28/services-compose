@@ -93,7 +93,17 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - postgres    
-
+  pga: 
+    image: busybox:latest
+    depends_on:
+      - postgres
+      - pgadmin
+  elk:
+    image: busybox:latest
+    depends_on:
+      - elasticsearch
+      - kibana
+      - logstash
 networks:
   postgres:
     driver: bridge
