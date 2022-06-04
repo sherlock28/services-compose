@@ -30,7 +30,7 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - ./postgres/postgres.env
+      - ./postgresql/postgres.env
     volumes:
       - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./postgresql/database/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
