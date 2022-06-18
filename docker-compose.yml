@@ -4,9 +4,9 @@ services:
     image: mongo:latest
     container_name: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongoadmin
-      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: mongoadmin
+    #   MONGO_INITDB_ROOT_PASSWORD: mongoadmin
     ports:
       - "27017:27017"
     volumes:
@@ -104,6 +104,17 @@ services:
       - elasticsearch
       - kibana
       - logstash
+  graphql-engine:
+    image: hasura/graphql-engine:latest
+    ports:
+    - "7070:8080"
+    depends_on:
+    - "postgres"
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@postgres:5432/mydb
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
 networks:
   postgres:
     driver: bridge
