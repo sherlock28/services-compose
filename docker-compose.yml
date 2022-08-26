@@ -27,18 +27,18 @@ services:
   postgres:
     image: postgres:11.16-alpine
     container_name: postgres
+    restart: always
     ports:
       - "5432:5432"
     env_file:
       - ./postgresql/postgres.env
     volumes:
+      - pgdb_data:/var/lib/postgresql/data
       - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./postgresql/database/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      # - ./postgres/conf.d:/etc/postgresql/conf.d
-      - pgdb_data:/var/lib/postgresql/data
       - ./localtime.buenos_aires:/etc/localtime.buenos_aires
+      # - ./postgres/conf.d:/etc/postgresql/conf.d
     # entrypoint: tail -f /dev/null
-    restart: always
     # environment:
     #   - POSTGRES_DB=mydb
     #   - POSTGRES_USER=postgres
