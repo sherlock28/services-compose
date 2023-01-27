@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 services:
   mongo:
     image: mongo:latest
@@ -17,9 +17,8 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: mydb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mysqladmin
-      MYSQL_ROOT_PASSWORD: mysqladmin
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:
@@ -115,7 +114,20 @@ services:
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@postgres:5432/mydb
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"RS256", "key": "-----BEGIN PUBLIC KEY----- PUBLIC KEY-----END PUBLIC KEY-----\n", "claims_format": "stringified_json"}'
+  nfs-server:
+    image: itsthenetwork/nfs-server-alpine:12
+    container_name: nfs-server
+    restart: unless-stopped
+    privileged: true
+    command: "-N -n -v /var/nfs/store -e '*(rw,sync,fsid=0,no_subtree_check,no_root_squash)'"
+    ports:
+      - 2049:2049
+    environment:
+      - SHARED_DIRECTORY=/var/nfs/store
+    volumes:
+      - ./nfs-storage:/var/nfs/store
 networks:
   postgres:
     driver: bridge
