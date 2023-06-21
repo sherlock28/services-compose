@@ -88,11 +88,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - 8080:80
+      - 8081:80
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      - postgres    
+    # depends_on:
+    #   - postgres  
   pga: 
     image: busybox:latest
     depends_on:
@@ -128,6 +128,22 @@ services:
       - SHARED_DIRECTORY=/var/nfs/store
     volumes:
       - ./nfs-storage:/var/nfs/store
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sqlserver
+    restart: always
+    env_file:
+      - ./sqlserver/sqlserver.env
+      - ./sqlserver/sapassword.env
+    ports:
+      - '1433:1433'
+    volumes:
+      - sql-server-data:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+      - sqlbackup:/var/opt/sqlserver/backup
+      - /c/docker/shared:/usr/shared
+  
 networks:
   postgres:
     driver: bridge
@@ -140,3 +156,8 @@ volumes:
   esdb_data:
   logstashdb_data:
   pgadmin_data:
+  sql-server-data:
+    driver: local
+  sqldata:
+  sqllog:
+  sqlbackup:
