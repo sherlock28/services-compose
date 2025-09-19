@@ -143,7 +143,22 @@ services:
       - sqllog:/var/opt/sqlserver/log
       - sqlbackup:/var/opt/sqlserver/backup
       - /c/docker/shared:/usr/shared
-  
+
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    restart: unless-stopped
+    container_name: heimdall
+    ports:
+      - 8090:80
+      - 8443:443
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - ALLOW_INTERNAL_REQUESTS=false #optional
+    volumes:
+      - ./config:/config
+
 networks:
   postgres:
     driver: bridge
